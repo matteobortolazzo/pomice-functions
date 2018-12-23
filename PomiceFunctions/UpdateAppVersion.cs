@@ -53,13 +53,15 @@ namespace PomiceFunctions
                });
 
             entry = await GetLatestEntry();
-            await contentManagementUrl
+            var result = await contentManagementUrl
                .AppendPathSegments("entries", entry.Sys.Id, "published")
                .WithOAuthBearerToken(contentManagementToken)
                .WithHeader("X-Contentful-Version", entry.Sys.Version)
                .PutJsonAsync(new { });
 
-            return req.CreateResponse(HttpStatusCode.OK, "Version " + buildName + " online");
+            if (result.IsSuccessStatusCode)
+                return req.CreateResponse(HttpStatusCode.OK, "Version " + buildName + " online");
+            return req.CreateResponse(HttpStatusCode.BadRequest);
         }
 
         class CtfCollection
